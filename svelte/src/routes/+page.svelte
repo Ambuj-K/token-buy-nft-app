@@ -3,14 +3,15 @@
     import AllowTokenMint from "../lib/AllowTokenMint.svelte"
     import MyNFTs from "../lib/MyNFTs.svelte"
     import contractNFTAppAbi from "../contracts/NFTApp.json";
-    const contractNFTAppAddr =  "0xD5Aad5471F3ddEFdAc0dc752CaCc2e44Ba58Af95";
+    const contractNFTAppAddr =  "0x036cc3430c17522049D6E765C5007c421B5fbe21";
     import contractAppTokenAbi from "../contracts/PlatformToken.json";
     const contractAppTokenAddr =  "0x04e01A000a44F6CAb464594E63b70E39B4C8a22a";
     export let web3Props = {
         provider: null, 
         signer: null, 
         account: null, 
-        chainId: null, 
+        chainId: null,
+        addressNFTApp: null, 
         contractNFTApp: null,
         contractCoinApp: null
     };

@@ -14,21 +14,22 @@ error NFTApp_TokensNotEnough();
 error NFTApp__LowTokenUser();
 error NFTApp__TokenTransferToUserFailed();
 error NFTApp__TokenTransferToNFTContractFailed();
+error NFTApp__TokenApprovalToNFTContractFailed();
 
 contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
 
   // Staking token used by the app
-  IERC20 public s_NFTToken;
+  IERC20 internal s_NFTToken;
 
   // Owner address
-  address public owner_addr;
+  address internal owner_addr;
 
   // Counter for token id counter
   using Counters for Counters.Counter;  
   Counters.Counter internal s_tokenIdCounter;
 
   // Reward rate per second is 100
-  uint256 public constant NFT_TOKEN_RATE = 100;
+  uint256 internal constant NFT_TOKEN_RATE = 100;
 
   // Events
   event NFTApp__NFTMintToUserSuccess(address, string);
@@ -62,7 +63,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
   function approveTokensForContract(uint256 _tokenamount) public returns(bool){
     bool success  = s_NFTToken.approve(address(this), _tokenamount);
     if (!success){
-      revert NFTApp__TokenTransferToUserFailed();
+      revert NFTApp__TokenApprovalToNFTContractFailed();
     }
     return true;
   }
@@ -99,4 +100,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     return s_NFTToken.balanceOf(address(this));
   }
 
+  function getPerTokenValue() public pure returns(uint256){
+    return NFT_TOKEN_RATE;
+  }
 }

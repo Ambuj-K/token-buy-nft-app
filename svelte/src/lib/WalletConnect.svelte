@@ -8,7 +8,8 @@
         provider: null, 
         signer: null, 
         account: null, 
-        chainId: null, 
+        chainId: null,
+        addressNFTApp: null,  
         contractNFTApp: null,
         contractCoinApp: null
     };
@@ -20,9 +21,10 @@
         const signer = provider.getSigner();
         const account = await signer.getAddress();
         const chainId = await signer.getChainId();
+        const addressNFTApp = contractNFTAppAddr;
         const contractNFTApp = new ethers.Contract(contractNFTAppAddr, contractNFTAppAbi.abi, signer);
         const contractCoinApp = new ethers.Contract(contractAppTokenAddr, contractAppTokenAbi.abi, signer);
-        web3Props = { provider, signer, account, chainId, contractNFTApp, contractCoinApp};
+        web3Props = { provider, signer, account, chainId, addressNFTApp, contractNFTApp, contractCoinApp};
     }
 </script>
 

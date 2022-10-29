@@ -5,36 +5,37 @@
         signer: null, 
         account: null, 
         chainId: null, 
+        addressNFTApp: null, 
         contractNFTApp: null,
         contractCoinApp: null
   };
 
-  $: NFT_json = null;
   $: amount = null;
   $: status = null;
   $: NFT_token_price = null;
   $: user_token_balance = null;
 
   async function Mint(art_uri) {
+      await web3Props.contractNFTApp.mint(web3Props.account, art_uri, {
+            gasLimit: 5000000
+        });
       status = "MINTING...";
-      await web3Props.contract.mint(art_uri,{
-          value: 60000000,
-          gasLimit: 100000
-      });
-
       web3Props.contract.on("NFTApp__NFTMintToUserSuccess", async (uri_no,addr) =>  { 
-         
-         status = "LOADED";
+
+        status = "LOADED";
       });
   }
 
-  async function ApproveNFTContractToken(){
+  async function approveNFTContractToken(){
     // approve tokens to contract for users
+    web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther("1000000000000"));
   }
-  ApproveNFTContractToken()
+
+  approveNFTContractToken();
 
   async function transferTokensToUser(){
     // transfer tokens to users
+    await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*100)));
   }
 
   async function userTokenBalance(){
@@ -45,41 +46,37 @@
 
   async function pricePerNFTToken(){
     // price per nft token
-    NFT_token_price = await web3Props.contractNFTApp.NFT_TOKEN_RATE;
-    console.log(NFT_token_price)
+    NFT_token_price = await web3Props.contractNFTApp.getPerTokenValue();
   }
   pricePerNFTToken();
   
 </script>
 
 <div class='wrapper'>
-  {#if !NFT_json & status!="MINTING..."}
-    Each Token Price is {NFT_token_price}<br/>
+  {#if status!="MINTING..."}
+    Each NFT Price is {NFT_token_price} Tokens<br/>
     <input className="writeInput" placeholder="x 100" type="text" autoFocus={true}
     bind:value={amount} size="20" height="20"/>
     <button class='bttn' on:click={transferTokensToUser}>Mint Tokens</button>
-    {user_token_balance}
-    <button class='bttn' on:click={userTokenBalance}>check balance</button>
-    <br/>
+    <br/><br/>
     Your current token balance is {user_token_balance}<br/><br/><br/>
     {#if user_token_balance}
-        <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmW5hZbSWAVrc4EeUMsxVgQ8pdmSyKuheChi6HswsLQ95Y"} alt="Loading..."/>
-        <br/>
-        <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://Qmc6qfwny924kLWfoxKpA3VsauFKnBUecm8912RM1DfJbe")}>Mint This NFT</button>
-        <br/>
-        <br/>
-        <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmT4Bo748YNMQtkrmsFimPYrpP4ni1yiVodUq9NfBxR8ei"} alt="Loading..."/>
-        <br/>
-        <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://QmYgb3tawCnMGPMV4DGFawNznEBzoFNXsZNwvTPDB4mZxc")}>Mint This NFT</button>
+        <div class="row">
+            <div class="column column-1">
+                <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmW5hZbSWAVrc4EeUMsxVgQ8pdmSyKuheChi6HswsLQ95Y"} alt="Loading..."/>
+                <br/><br/>
+                <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://Qmc6qfwny924kLWfoxKpA3VsauFKnBUecm8912RM1DfJbe")}>Mint This NFT</button>
+            </div>
+            <div class="column column-2">
+                <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmT4Bo748YNMQtkrmsFimPYrpP4ni1yiVodUq9NfBxR8ei"} alt="Loading..."/>
+                <br/><br/>
+                <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://QmYgb3tawCnMGPMV4DGFawNznEBzoFNXsZNwvTPDB4mZxc")}>Mint This NFT</button>
+            </div>
+        </div>
     <br/>
     {/if}
   {:else if status=="MINTING..."}
     <div class="loading">
-        {status}
-    </div> 
-    <br/>
-  {:else}
-    <div class="loaded">
         {status}
     </div> 
     <br/>
@@ -125,4 +122,12 @@
       text-align: center;
       text-shadow: 0ex;
   }
+    .row {
+    display: flex;
+    }
+
+    .column {
+    flex: 50%;
+    text-align: center;
+    }
 </style>

@@ -6,8 +6,10 @@
         provider: null, 
         signer: null, 
         account: null, 
-        chainId: null, 
-        contract: null 
+        chainId: null,
+        addressNFTApp: null,  
+        contractNFTApp: null,
+        contractCoinApp: null
     };
 
     $: NFTs = []
