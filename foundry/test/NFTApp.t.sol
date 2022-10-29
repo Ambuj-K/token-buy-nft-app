@@ -13,7 +13,7 @@ contract NFTAppTest is DSTest {
 
     function setUp() public {
         addr = 0x1234567890123456789012345678901234567890;
-        token =new PlatformToken(1000000000000 * 1e18);
+        token =new PlatformToken();
         artUris = "ipfs://QmRAakxqsTJqGAhd5yd3iip4fEL7KMZanTaxLH9k2wHqND";
         NFTAppObj = new NFTApp(address(token), artUris, "NFTApp", "NFTA");
     }

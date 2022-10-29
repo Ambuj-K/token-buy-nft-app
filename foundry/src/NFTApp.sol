@@ -2,9 +2,7 @@
 
 pragma solidity >=0.8.9;
 
-import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
@@ -15,9 +13,8 @@ error NFTApp_TokensNotEnough();
 error NFTApp__LowTokenUser();
 error NFTApp__TokenTransferToUserFailed();
 error NFTApp__TokenTransferToNFTContractFailed();
-error NFTApp__NotOwner();
 
-contract NFTApp is ERC721, ERC721URIStorage, Ownable, ReentrancyGuard {
+contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
 
   // Staking token used by the app
   IERC20 public s_NFTToken;
@@ -102,19 +99,6 @@ contract NFTApp is ERC721, ERC721URIStorage, Ownable, ReentrancyGuard {
 
   function getContractTokenBalance() public onlyOwner view returns(uint256){
     return s_NFTToken.balanceOf(address(this));
-  }
-
-  function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
-    super._burn(tokenId);
-  }
-
-  function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-  {
-    return super.tokenURI(tokenId);
   }
 
 }

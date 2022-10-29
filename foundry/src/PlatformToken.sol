@@ -16,8 +16,8 @@ contract PlatformToken {
 
     uint256 totalSupply_;
 
-    constructor(uint256 total) {
-      totalSupply_ = total;
+    constructor() {
+      totalSupply_ = 1000000000000 * 1e18; //mint tokens
       balances[msg.sender] = totalSupply_;
     }
 
