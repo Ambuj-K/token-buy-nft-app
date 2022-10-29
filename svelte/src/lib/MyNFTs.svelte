@@ -27,7 +27,7 @@
         for (const nft of nftsForOwner.ownedNfts) {
             const response = await alchemy.nft.getNftMetadata(
             nft.contract.address, nft.tokenId);
-            if (response.rawMetadata.description == "NFT As NFT"){
+            if (response.rawMetadata.description == "Astronaut, Stout"){
                 const NFT_response = await fetch("https://api.ipfsbrowser.com/ipfs/get.php?hash="+response.rawMetadata.external_url.split("//")[1]);
                 const data = await NFT_response.json();
                 NFTs = [...NFTs, [data["title"], data["text"]]];
