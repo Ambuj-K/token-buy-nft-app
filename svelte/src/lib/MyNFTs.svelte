@@ -27,10 +27,10 @@
         for (const nft of nftsForOwner.ownedNfts) {
             const response = await alchemy.nft.getNftMetadata(
             nft.contract.address, nft.tokenId);
-            if (response.rawMetadata.description == "Astronaut, Stout"){
-                const NFT_response = await fetch("https://api.ipfsbrowser.com/ipfs/get.php?hash="+response.rawMetadata.external_url.split("//")[1]);
-                const data = await NFT_response.json();
-                NFTs = [...NFTs, [data["title"], data["text"]]];
+            if (response.rawMetadata.description == "Astronaut, Stout" || response.rawMetadata.description == "Wings, Beautiful"){
+                const NFT_image = "https://api.ipfsbrowser.com/ipfs/get.php?hash="+response.rawMetadata.image.split("//")[1];
+                NFTs = [...NFTs, [response.rawMetadata.name, NFT_image]];
+                // console.log(response.rawMetadata)
             }
         }
     }
@@ -47,7 +47,7 @@
                 <label for="accordion-check-1">{NFT[0]}</label>
                 <input type="checkbox" checked name="accordion2" id="accordion-check-1" hidden>
                 <div class="accordion-item">
-                <p>{NFT[1]}</p>
+                <p><img class="image_div" src={NFT[1]} alt="Loading..."/></p>
             </div>
             </div>
         {/each} 
@@ -91,5 +91,12 @@
 * {
   box-sizing: border-box;
 }
+
+.image_div{
+      background-color: wheat;
+      box-shadow: 1px 4px 1px rgba(0,0,0,0.3);
+      width: 500px;
+      height: 500px;
+  }
 	
 </style>

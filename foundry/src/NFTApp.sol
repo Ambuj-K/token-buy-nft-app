@@ -8,7 +8,8 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-//Error Types
+// Error Types
+// "require" string is gas expensive, so custom descriptive error
 error NFTApp_TokensNotEnough(); 
 error NFTApp__LowTokenUser();
 error NFTApp__TokenTransferToUserFailed();
@@ -19,34 +20,31 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
   // Staking token used by the app
   IERC20 public s_NFTToken;
 
+  // Owner address
   address public owner_addr;
 
   // Counter for token id counter
   using Counters for Counters.Counter;  
   Counters.Counter internal s_tokenIdCounter;
 
-  // art uri address
-  string internal s_artURI;
+  // Reward rate per second is 100
+  uint256 public constant NFT_TOKEN_RATE = 100;
 
-  // reward rate per second is 100
-  uint256 internal constant NFT_TOKEN_RATE = 100;
-
-  // events
+  // Events
   event NFTApp__NFTMintToUserSuccess(address, string);
 
   constructor(
     address _tokenAddress,
-    string memory _artURI,
     string memory _tokenName,
     string memory _tokenSymbol
   ) ERC721(_tokenName, _tokenSymbol) {
 
     owner_addr = msg.sender;
     s_NFTToken = IERC20(_tokenAddress);
-    s_artURI = _artURI;
 
   }
 
+  // Transfer tokens to user
   function transferTokensToUser(address user_addr, uint256 _amount) public returns(bool){
     bool success = s_NFTToken.transferFrom(owner_addr, user_addr, _amount);
     if (!success){
@@ -55,10 +53,12 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     return true;
   }
 
+  // Get user token balance
   function getUserTokenBalance(address user_addr) public view returns(uint256){ 
-    return s_NFTToken.balanceOf(user_addr);// balanceOf function is already declared in ERC20 token function
+    return s_NFTToken.balanceOf(user_addr);
   }
 
+  // Approve tokens for the contract
   function approveTokensForContract(uint256 _tokenamount) public returns(bool){
     bool success  = s_NFTToken.approve(address(this), _tokenamount);
     if (!success){
@@ -67,11 +67,13 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     return true;
   }
 
+  // Check allowance of tokens of contract by sender
   function getAllowance() public view returns(uint256){
        return s_NFTToken.allowance(msg.sender, address(this));
   }
 
-  function mint(address to) external {
+  // Mint art uri to address
+  function mint(address to, string memory art_uri) external {
 
     uint256 tokenId = s_tokenIdCounter.current();
     s_tokenIdCounter.increment();
@@ -80,23 +82,19 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
       revert NFTApp__LowTokenUser();
     }
     else{
-      // IERC transfer function to take NFTToken from sender to this contract
-      // bool success = s_NFTToken.transferFrom(msg.sender, address(this), NFT_TOKEN_RATE);
-
-      // require string is gas expensive, so custom descriptive error
-
 
       bool success = s_NFTToken.transferFrom(msg.sender, address(this), NFT_TOKEN_RATE * 1e18);
       if (!success){
         revert NFTApp__TokenTransferToNFTContractFailed();
       }
       _safeMint(to, tokenId);
-      _setTokenURI(tokenId, s_artURI);
+      _setTokenURI(tokenId, art_uri);
 
-      emit NFTApp__NFTMintToUserSuccess(to, s_artURI);
+      emit NFTApp__NFTMintToUserSuccess(to, art_uri);
     }
   }
 
+  // contracts token count response
   function getContractTokenBalance() public onlyOwner view returns(uint256){
     return s_NFTToken.balanceOf(address(this));
   }

@@ -1,13 +1,16 @@
 <script>
     import {ethers} from 'ethers';
-    export let contractAddr = '';
-    export let contractAbi = {abi : null};
+    export let contractNFTAppAddr = '';
+    export let contractNFTAppAbi = {abi : null};
+    export let contractAppTokenAddr = '';
+    export let contractAppTokenAbi = {abi : null};
     export let web3Props = { 
         provider: null, 
         signer: null, 
         account: null, 
         chainId: null, 
-        contract: null 
+        contractNFTApp: null,
+        contractCoinApp: null
     };
     
     async function connectWallet() {
@@ -17,8 +20,9 @@
         const signer = provider.getSigner();
         const account = await signer.getAddress();
         const chainId = await signer.getChainId();
-        const contract = new ethers.Contract(contractAddr, contractAbi.abi, signer);
-        web3Props = { provider, signer, account, chainId, contract };
+        const contractNFTApp = new ethers.Contract(contractNFTAppAddr, contractNFTAppAbi.abi, signer);
+        const contractCoinApp = new ethers.Contract(contractAppTokenAddr, contractAppTokenAbi.abi, signer);
+        web3Props = { provider, signer, account, chainId, contractNFTApp, contractCoinApp};
     }
 </script>
 

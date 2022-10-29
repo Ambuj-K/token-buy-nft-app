@@ -14,15 +14,14 @@ contract NFTAppTest is DSTest {
     function setUp() public {
         addr = 0x1234567890123456789012345678901234567890;
         token =new PlatformToken();
-        artUris = "ipfs://QmRAakxqsTJqGAhd5yd3iip4fEL7KMZanTaxLH9k2wHqND";
-        NFTAppObj = new NFTApp(address(token), artUris, "NFTApp", "NFTA");
+        NFTAppObj = new NFTApp(address(token), "NFTApp", "NFTA");
     }
     
     // test mint and NFT token cost worth of tokens credit to contract account
     function testMint() public {
         token.approve(address(NFTAppObj), 1000 ether);
         NFTAppObj.transferTokensToUser(addr,100 ether);
-        NFTAppObj.mint(addr);
+        NFTAppObj.mint(addr, "ipfs://QmRAakxqsTJqGAhd5yd3iip4fEL7KMZanTaxLH9k2wHqND");
         emit log_uint(NFTAppObj.getContractTokenBalance());
         assertEq(NFTAppObj.getContractTokenBalance(),100 ether);
     }

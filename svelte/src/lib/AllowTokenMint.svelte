@@ -1,51 +1,88 @@
 <script>
   import {ethers} from 'ethers';
   export let web3Props = { 
-      provider: null, 
-      signer: null, 
-      account: null, 
-      chainId: null, 
-      contract: null 
+        provider: null, 
+        signer: null, 
+        account: null, 
+        chainId: null, 
+        contractNFTApp: null,
+        contractCoinApp: null
   };
 
   $: NFT_json = null;
-  $: image_url = null;
+  $: amount = null;
   $: status = null;
+  $: NFT_token_price = null;
+  $: user_token_balance = null;
 
-  async function Mint() {
+  async function Mint(art_uri) {
       status = "MINTING...";
-      await web3Props.contract.requestNft({
+      await web3Props.contract.mint(art_uri,{
           value: 60000000,
           gasLimit: 100000
       });
 
-      web3Props.contract.on("mintedNFT", async (uri_no,addr) =>  { 
-         NFT_json = await web3Props.contract.artURIsGetter(uri_no);
-         const response = await fetch("https://api.ipfsbrowser.com/ipfs/get.php?hash="+NFT_json.split("//")[1]);
-         const data = await response.json();
-         image_url = "https://api.ipfsbrowser.com/ipfs/get.php?hash="+String(data.image).split("//")[1];
+      web3Props.contract.on("NFTApp__NFTMintToUserSuccess", async (uri_no,addr) =>  { 
+         
          status = "LOADED";
       });
   }
+
+  async function ApproveNFTContractToken(){
+    // approve tokens to contract for users
+  }
+  ApproveNFTContractToken()
+
+  async function transferTokensToUser(){
+    // transfer tokens to users
+  }
+
+  async function userTokenBalance(){
+    // user token balance
+    user_token_balance = await web3Props.contractNFTApp.getUserTokenBalance(web3Props.account)/1e18;
+  }
+  userTokenBalance();
+
+  async function pricePerNFTToken(){
+    // price per nft token
+    NFT_token_price = await web3Props.contractNFTApp.NFT_TOKEN_RATE;
+    console.log(NFT_token_price)
+  }
+  pricePerNFTToken();
+  
 </script>
 
 <div class='wrapper'>
   {#if !NFT_json & status!="MINTING..."}
-  <button class='bttn' on:click={Mint}>Mint An NFT</button>
-  <br/>
+    Each Token Price is {NFT_token_price}<br/>
+    <input className="writeInput" placeholder="x 100" type="text" autoFocus={true}
+    bind:value={amount} size="20" height="20"/>
+    <button class='bttn' on:click={transferTokensToUser}>Mint Tokens</button>
+    {user_token_balance}
+    <button class='bttn' on:click={userTokenBalance}>check balance</button>
+    <br/>
+    Your current token balance is {user_token_balance}<br/><br/><br/>
+    {#if user_token_balance}
+        <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmW5hZbSWAVrc4EeUMsxVgQ8pdmSyKuheChi6HswsLQ95Y"} alt="Loading..."/>
+        <br/>
+        <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://Qmc6qfwny924kLWfoxKpA3VsauFKnBUecm8912RM1DfJbe")}>Mint This NFT</button>
+        <br/>
+        <br/>
+        <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmT4Bo748YNMQtkrmsFimPYrpP4ni1yiVodUq9NfBxR8ei"} alt="Loading..."/>
+        <br/>
+        <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://QmYgb3tawCnMGPMV4DGFawNznEBzoFNXsZNwvTPDB4mZxc")}>Mint This NFT</button>
+    <br/>
+    {/if}
   {:else if status=="MINTING..."}
-  <div class="loading">
-      {status}
-  </div> 
-  <br/>
+    <div class="loading">
+        {status}
+    </div> 
+    <br/>
   {:else}
-  {#if image_url}
-  <div class="loaded">
-      {status}
-  </div> 
-  <br/>
-      <img class="image_div" src={image_url} alt="Loading..."/>
-  {/if}
+    <div class="loaded">
+        {status}
+    </div> 
+    <br/>
   {/if}
 </div>
 

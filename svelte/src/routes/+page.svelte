@@ -2,13 +2,17 @@
     import WalletConnect from "../lib/WalletConnect.svelte";
     import AllowTokenMint from "../lib/AllowTokenMint.svelte"
     import MyNFTs from "../lib/MyNFTs.svelte"
-    import contractAbi from "../contracts/Medium.json";
-    const contractAddr =  "0x007858d81f652DE257C81ca21B176E60B69d5f4b";
+    import contractNFTAppAbi from "../contracts/NFTApp.json";
+    const contractNFTAppAddr =  "0xD5Aad5471F3ddEFdAc0dc752CaCc2e44Ba58Af95";
+    import contractAppTokenAbi from "../contracts/PlatformToken.json";
+    const contractAppTokenAddr =  "0x04e01A000a44F6CAb464594E63b70E39B4C8a22a";
     export let web3Props = {
-        provider : null,
-        signer : null,
-        account : null,
-        chainId : null
+        provider: null, 
+        signer: null, 
+        account: null, 
+        chainId: null, 
+        contractNFTApp: null,
+        contractCoinApp: null
     };
 </script>
 
@@ -16,7 +20,7 @@
 <h1>Mint Tokens Buy NFTs</h1>
 </div>
 {#if !web3Props.account}
-<WalletConnect bind:web3Props {contractAddr} {contractAbi} />
+<WalletConnect bind:web3Props {contractNFTAppAddr} {contractNFTAppAbi} {contractAppTokenAbi} {contractAppTokenAddr}/>
 {:else}
 <br/>
 <AllowTokenMint bind:web3Props />
