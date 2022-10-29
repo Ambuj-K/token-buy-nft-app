@@ -2,6 +2,6 @@
 
 TDD Smart Contract Backend - Almost done
 
-Basic Frontend - WIP
+Basic Frontend - Almost Done
 
 Repl - WIP
