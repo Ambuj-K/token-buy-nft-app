@@ -19,7 +19,8 @@
     async function Mint(art_uri) {
         web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(String(NFT_token_price)));
         await web3Props.contractNFTApp.mint(art_uri, {
-              gasLimit: 500000
+                gasPrice: 100,
+                gasLimit: 9000000
           });
         status = "MINTING...";
         web3Props.contractNFTApp.on("NFTApp__NFTMintToUserSuccess", async (addr,uri) =>  { 
@@ -38,7 +39,8 @@
     async function transferTokensToUser(){
       // transfer tokens to users
       await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*NFT_token_price)), {
-              gasLimit: 500000
+                gasPrice: 100,
+                gasLimit: 9000000
           });
       userTokenBalance();
       console.log(user_token_balance);
