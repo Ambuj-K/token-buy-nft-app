@@ -9,4 +9,4 @@ read -s rpc
 echo Which contract do you want to deploy \(eg Greeter\)?
 read contract
 
-forge create ./src/${contract}.sol:${contract} -i --rpc-url $rpc --constructor-args "0x04e01A000a44F6CAb464594E63b70E39B4C8a22a" "NFTApp" "NFTA"
+forge create ./src/${contract}.sol:${contract} -i --rpc-url $rpc --constructor-args "0xf0fec88b6e72657F3dAE1FB85046d76153D07524" "NFTApp" "NFTA"

@@ -5,7 +5,14 @@ import "forge-std/Test.sol";
 import "../src/NFTApp.sol";
 import "../src/PlatformToken.sol";
 
+interface CheatCodes {
+    function startPrank(address) external;
+    function stopPrank() external;
+}
+
 contract NFTAppTest is DSTest {
+    CheatCodes constant cheats = CheatCodes(HEVM_ADDRESS);
+
     NFTApp public NFTAppObj;
     PlatformToken public token;
     string public artUris;
@@ -20,8 +27,12 @@ contract NFTAppTest is DSTest {
     // test mint and NFT token cost worth of tokens credit to contract account
     function testMint() public {
         token.approve(address(NFTAppObj), 1000 ether);
-        NFTAppObj.transferTokensToUser(addr,100 ether);
-        NFTAppObj.mint(addr, "ipfs://QmRAakxqsTJqGAhd5yd3iip4fEL7KMZanTaxLH9k2wHqND");
+        NFTAppObj.transferTokensToUser(addr, 100 ether);
+        emit log_uint(NFTAppObj.getUserTokenBalance(addr));
+        cheats.startPrank(address(addr));
+        token.approve(address(NFTAppObj), 100 ether);
+        NFTAppObj.mint("ipfs://QmRAakxqsTJqGAhd5yd3iip4fEL7KMZanTaxLH9k2wHqND");
+        cheats.stopPrank();
         emit log_uint(NFTAppObj.getContractTokenBalance());
         assertEq(NFTAppObj.getContractTokenBalance(),100 ether);
     }

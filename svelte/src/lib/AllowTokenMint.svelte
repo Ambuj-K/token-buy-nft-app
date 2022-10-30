@@ -16,8 +16,9 @@
     $: user_token_balance = null;
   
     async function Mint(art_uri) {
-        await web3Props.contractNFTApp.mint(web3Props.account, art_uri, {
-              gasLimit: 5000000
+        web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(String(NFT_token_price)));
+        await web3Props.contractNFTApp.mint(art_uri, {
+              gasLimit: 500000
           });
         status = "MINTING...";
         web3Props.contractNFTApp.on("NFTApp__NFTMintToUserSuccess", async (addr,uri) =>  { 
@@ -25,19 +26,20 @@
         });
     }
   
-    async function approveNFTContractToken(){
+    async function approveNFTContractToken(tokens){
       // approve tokens to contract for users
-      web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther("1000000000000"));
+      web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(tokens));
     }
   
-  //   approveNFTContractToken();
+  //   only once
+  //   approveNFTContractToken("100000000");
   
     async function transferTokensToUser(){
       // transfer tokens to users
-      await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*100)), {
-              gasLimit: 5000000
+      await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*NFT_token_price)), {
+              gasLimit: 500000
           });
-      await userTokenBalance();
+      userTokenBalance();
       console.log(user_token_balance);
       inputField.value='';
     }
@@ -64,7 +66,7 @@
       You get N x {NFT_token_price} Tokens<br/><br/>
       <button class='bttn' on:click={transferTokensToUser}>Mint Tokens</button>
       <br/><br/>
-      Your current token balance is {user_token_balance}<br/><br/><br/>
+      Your current token balance is {NFT_token_price}<br/><br/><br/>
       {#if user_token_balance}
           <div class="row">
               <div class="column column-1">

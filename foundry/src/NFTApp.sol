@@ -60,7 +60,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
   }
 
   // Mint art uri to address
-  function mint(address to, string memory art_uri) external nonReentrant {
+  function mint(string memory art_uri) external nonReentrant {
 
     uint256 tokenId = s_tokenIdCounter.current();
     s_tokenIdCounter.increment();
@@ -74,10 +74,10 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
       if (!success){
         revert NFTApp__TokenTransferToNFTContractFailed();
       }
-      _safeMint(to, tokenId);
+      _safeMint(msg.sender, tokenId);
       _setTokenURI(tokenId, art_uri);
 
-      emit NFTApp__NFTMintToUserSuccess(to, art_uri);
+      emit NFTApp__NFTMintToUserSuccess(msg.sender, art_uri);
     }
   }
 
@@ -86,7 +86,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     return s_NFTToken.balanceOf(address(this));
   }
 
-  // get
+  // get token value of each nft
   function getPerTokenValue() public pure returns(uint256){
     return NFT_TOKEN_RATE;
   }
