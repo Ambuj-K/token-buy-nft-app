@@ -10,11 +10,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 // Error Types
 // "require" string is gas expensive, so custom descriptive error
-error NFTApp_TokensNotEnough(); 
 error NFTApp__LowTokenUser();
 error NFTApp__TokenTransferToUserFailed();
 error NFTApp__TokenTransferToNFTContractFailed();
-error NFTApp__TokenApprovalToNFTContractFailed();
 
 contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
 
@@ -47,7 +45,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
   }
 
   // Transfer tokens to user
-  function transferTokensToUser(address user_addr, uint256 _amount) public returns(bool){
+  function transferTokensToUser(address user_addr, uint256 _amount) public nonReentrant returns(bool) {
     bool success = s_NFTToken.transferFrom(owner_addr, user_addr, _amount);
     if (!success){
       revert NFTApp__TokenTransferToUserFailed();
@@ -61,27 +59,13 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     return s_NFTToken.balanceOf(user_addr);
   }
 
-  // Approve tokens for the contract
-  function approveTokensForContract(uint256 _tokenamount) public returns(bool){
-    bool success  = s_NFTToken.approve(address(this), _tokenamount);
-    if (!success){
-      revert NFTApp__TokenApprovalToNFTContractFailed();
-    }
-    return true;
-  }
-
-  // Check allowance of tokens of contract by sender
-  function getAllowance() public view returns(uint256){
-       return s_NFTToken.allowance(msg.sender, address(this));
-  }
-
   // Mint art uri to address
-  function mint(address to, string memory art_uri) external {
+  function mint(address to, string memory art_uri) external nonReentrant {
 
     uint256 tokenId = s_tokenIdCounter.current();
     s_tokenIdCounter.increment();
 
-    if(getAllowance() < NFT_TOKEN_RATE*1e18){
+    if(getUserTokenBalance(msg.sender) < NFT_TOKEN_RATE*1e18){
       revert NFTApp__LowTokenUser();
     }
     else{
