@@ -13,7 +13,8 @@
     $: amount = null;
     $: status = null;
     $: NFT_token_price = null;
-    $: user_token_balance = null;
+    let user_token_balance = userTokenBalance();
+    $: user_token_balance_reactive = user_token_balance;
   
     async function Mint(art_uri) {
         web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(String(NFT_token_price)));
@@ -48,7 +49,6 @@
       // user token balance
       user_token_balance = await web3Props.contractNFTApp.getUserTokenBalance(web3Props.account)/1e18;
     }
-    userTokenBalance();
   
     async function pricePerNFTToken(){
       // price per nft token
@@ -66,7 +66,7 @@
       You get N x {NFT_token_price} Tokens<br/><br/>
       <button class='bttn' on:click={transferTokensToUser}>Mint Tokens</button>
       <br/><br/>
-      Your current token balance is {NFT_token_price}<br/><br/><br/>
+      Your current token balance is {user_token_balance_reactive}<br/><br/><br/>
       {#if user_token_balance}
           <div class="row">
               <div class="column column-1">
