@@ -33,6 +33,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
 
   // Events
   event NFTApp__NFTMintToUserSuccess(address, string);
+  event NFTApp__TokensTransferredToUser(address, uint256);
 
   constructor(
     address _tokenAddress,
@@ -51,6 +52,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     if (!success){
       revert NFTApp__TokenTransferToUserFailed();
     }
+    emit NFTApp__TokensTransferredToUser(user_addr, _amount);
     return true;
   }
 
@@ -100,6 +102,7 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
     return s_NFTToken.balanceOf(address(this));
   }
 
+  // get
   function getPerTokenValue() public pure returns(uint256){
     return NFT_TOKEN_RATE;
   }

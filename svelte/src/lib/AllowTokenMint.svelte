@@ -20,8 +20,7 @@
             gasLimit: 5000000
         });
       status = "MINTING...";
-      web3Props.contract.on("NFTApp__NFTMintToUserSuccess", async (uri_no,addr) =>  { 
-
+      web3Props.contractNFTApp.on("NFTApp__NFTMintToUserSuccess", async (addr,uri) =>  { 
         status = "LOADED";
       });
   }
@@ -31,11 +30,13 @@
     web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther("1000000000000"));
   }
 
-  approveNFTContractToken();
+//   approveNFTContractToken();
 
   async function transferTokensToUser(){
     // transfer tokens to users
     await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*100)));
+    await userTokenBalance();
+    console.log(user_token_balance)
   }
 
   async function userTokenBalance(){
