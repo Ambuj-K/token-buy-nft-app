@@ -45,13 +45,12 @@ contract NFTApp is ERC721URIStorage, Ownable, ReentrancyGuard {
   }
 
   // Transfer tokens to user
-  function transferTokensToUser(address user_addr, uint256 _amount) public nonReentrant returns(bool) {
+  function transferTokensToUser(address user_addr, uint256 _amount) public nonReentrant {
     bool success = s_NFTToken.transferFrom(owner_addr, user_addr, _amount);
     if (!success){
       revert NFTApp__TokenTransferToUserFailed();
     }
     emit NFTApp__TokensTransferredToUser(user_addr, _amount);
-    return true;
   }
 
   // Get user token balance

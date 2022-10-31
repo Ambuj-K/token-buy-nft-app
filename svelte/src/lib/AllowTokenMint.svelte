@@ -13,14 +13,12 @@
     $: amount = null;
     $: status = null;
     $: NFT_token_price = null;
-    let user_token_balance = userTokenBalance();
-    $: user_token_balance_reactive = user_token_balance;
+    $: user_token_balance = null;
   
     async function Mint(art_uri) {
-        web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(String(NFT_token_price)));
+        await web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(String(NFT_token_price)));
         await web3Props.contractNFTApp.mint(art_uri, {
-                gasPrice: 100,
-                gasLimit: 9000000
+                gasLimit: 200000
           });
         status = "MINTING...";
         web3Props.contractNFTApp.on("NFTApp__NFTMintToUserSuccess", async (addr,uri) =>  { 
@@ -30,27 +28,29 @@
   
     async function approveNFTContractToken(tokens){
       // approve tokens to contract for users
-      web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(tokens));
+      await web3Props.contractCoinApp.approve(web3Props.addressNFTApp, ethers.utils.parseEther(tokens));
     }
   
-  //   only once
-  //   approveNFTContractToken("100000000");
+    //   only once from user walletonly
+    //   approveNFTContractToken("100000000");
   
     async function transferTokensToUser(){
       // transfer tokens to users
-      await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*NFT_token_price)), {
-                gasPrice: 100,
-                gasLimit: 9000000
+        await web3Props.contractNFTApp.transferTokensToUser(web3Props.account, ethers.utils.parseEther(String(amount*NFT_token_price)), {
+                gasLimit: 200000
           });
-      userTokenBalance();
-      console.log(user_token_balance);
-      inputField.value='';
+        user_token_balance="Pending..."
+        web3Props.contractNFTApp.on("NFTApp__TokensTransferredToUser", async (addr,uri) =>  { 
+        userTokenBalance();
+        });
+        inputField.value='';
     }
   
     async function userTokenBalance(){
       // user token balance
       user_token_balance = await web3Props.contractNFTApp.getUserTokenBalance(web3Props.account)/1e18;
     }
+    userTokenBalance();
   
     async function pricePerNFTToken(){
       // price per nft token
@@ -65,25 +65,38 @@
       Each NFT Price is {NFT_token_price} Tokens<br/>
       <input className="writeInput" placeholder="N no of nfts to be bought" type="text" autoFocus={true}
       bind:value={amount} size="25" height="20" bind:this={inputField}/><br/>
+
       You get N x {NFT_token_price} Tokens<br/><br/>
+
       <button class='bttn' on:click={transferTokensToUser}>Mint Tokens</button>
       <br/><br/>
-      Your current token balance is {user_token_balance_reactive}<br/><br/><br/>
+
       {#if user_token_balance}
+          Your current token balance is {user_token_balance}<br/><br/><br/>
           <div class="row">
               <div class="column column-1">
                   <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmW5hZbSWAVrc4EeUMsxVgQ8pdmSyKuheChi6HswsLQ95Y"} alt="Loading..."/>
+                  
                   <br/><br/>
+
                   <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://Qmc6qfwny924kLWfoxKpA3VsauFKnBUecm8912RM1DfJbe")}>Mint This NFT</button>
               </div>
               <div class="column column-2">
                   <img class="image_div" src={"https://api.ipfsbrowser.com/ipfs/get.php?hash=QmT4Bo748YNMQtkrmsFimPYrpP4ni1yiVodUq9NfBxR8ei"} alt="Loading..."/>
+                  
                   <br/><br/>
+
                   <button class='bttn' on:click|preventDefault={()=>Mint("ipfs://QmYgb3tawCnMGPMV4DGFawNznEBzoFNXsZNwvTPDB4mZxc")}>Mint This NFT</button>
               </div>
           </div>
       <br/>
+
+      {:else if user_token_balance=="Pending..."}
+        Your current token balance is Pending...
+      {:else}
+        Your current token balance is 0<br/><br/><br/>
       {/if}
+      
     {:else if status=="MINTING..."}
       <div class="loading">
           {status}
